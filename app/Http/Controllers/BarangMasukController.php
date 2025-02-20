@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\BarangMasuk;
-use App\Models\barangMasuk as ModelsBarangMasuk;
 use App\Models\stok;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth as FacadesAuth;
+use Illuminate\Support\Facades\Auth;
 
 class BarangMasukController extends Controller
 {
@@ -28,7 +27,7 @@ class BarangMasukController extends Controller
             ]);
         }
 
-        $query->orderBy('Created_at', 'desc');
+        $query->orderBy('created_at', 'desc');
         $getData = $query->paginate(10);
             return view('barang.BarangMasuk.BarangMasuk', compact(
                 'getData'
@@ -73,7 +72,7 @@ class BarangMasukController extends Controller
         $saveBarangMasuk-> suplier_id = $updateStok->suplier_id;
         $saveBarangMasuk-> harga = $harga_beli;
         $saveBarangMasuk-> jumlah_barang_masuk = $request->jumlah;
-        $saveBarangMasuk-> admin_id = FacadesAuth::user()->id;
+        $saveBarangMasuk-> admin_id = Auth::user()->id;
         $saveBarangMasuk->save();
 
     $hitung = $updateStok->stok + $request->jumlah;

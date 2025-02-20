@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\barangKeluar;
+use App\Models\BarangMasuk;
 use App\Models\pelanggan;
 use App\Models\stok;
 use Illuminate\Http\Request;
@@ -10,9 +11,28 @@ use Illuminate\Support\Facades\Auth;
 
 class barangKeluarController extends Controller
 {
-   public function index()
+   public function index(Request $request)
    {
-    return view('barang.BarangKeluar.BarangKeluar');
+    $query = BarangMasuk::with(
+        'getStok',
+        'getPelanggan',
+        'getUser',
+    );
+
+    if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
+        $query->whereBetween('tgl_buat', [
+            $request->tanggal_awal,
+            $request->tanggal_akhir,
+        ]);
+    }
+
+    $query->orderBy('Created_at', 'desc');
+    $getBarangKeluar = $query->paginate(10);
+    $getTotalPendapatan = barangKeluar::sum('sub_total');
+        return view('barang.BarangMasuk.BarangMasuk', compact(
+            'getBarangKeluar',
+            'getTotalPendapatan',
+        ));
    }
 
    public function create()
@@ -141,7 +161,7 @@ class barangKeluarController extends Controller
             'message',
             'Barang Keluar add',
         );
-        
+
 
     }
     //kode_transaksi
